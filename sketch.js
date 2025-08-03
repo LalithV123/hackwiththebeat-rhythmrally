@@ -1,4 +1,3 @@
-
 let ball, paddle;
 let beatTimes = [];
 let beatIndex = 0;
@@ -6,6 +5,8 @@ let score = 0;
 let bpm = 90;
 let interval;
 let synth;
+let startButton;
+let started = false;
 
 function setup() {
   createCanvas(600, 400);
@@ -13,6 +14,7 @@ function setup() {
   ball = new Ball();
   textSize(20);
   fill(255);
+
   synth = new Tone.Synth().toDestination();
   Tone.Transport.bpm.value = bpm;
   interval = Tone.Time("4n").toSeconds();
@@ -21,8 +23,20 @@ function setup() {
     beatTimes.push(i * interval * 60);
   }
 
+  // Set up Start Button
+  startButton = createButton("Start Game");
+  startButton.position(width / 2 - 50, height / 2);
+  startButton.mousePressed(startGame);
+
+  noLoop(); // Pause draw loop until user starts
+}
+
+function startGame() {
+  Tone.start(); // Allow audio to work
   Tone.Transport.scheduleRepeat(playBeat, "4n");
   Tone.Transport.start();
+  startButton.hide();
+  loop(); // Begin draw loop
 }
 
 function draw() {
