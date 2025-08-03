@@ -1,17 +1,13 @@
 let ball, paddle;
-let beatTimes = [];
-let beatIndex = 0;
 let score = 0;
 let bpm = 90;
 let interval;
 let synth;
-let startButton;
-let started = false;
+let gameStarted = false;
 
 function setup() {
-  createCanvas(600, 400);
-  paddle = new Paddle();
-  ball = new Ball();
+  let cnv = createCanvas(600, 400);
+  cnv.parent("game"); // attach canvas to the HTML div
   textSize(20);
   fill(255);
 
@@ -19,28 +15,35 @@ function setup() {
   Tone.Transport.bpm.value = bpm;
   interval = Tone.Time("4n").toSeconds();
 
-  for (let i = 0; i < 64; i++) {
-    beatTimes.push(i * interval * 60);
-  }
+  createStartButton();
 
-  // Set up Start Button
-  startButton = createButton("Start Game");
-  startButton.position(width / 2 - 50, height / 2);
-  startButton.mousePressed(startGame);
+  noLoop(); // pause game loop
+}
 
-  noLoop(); // Pause draw loop until user starts
+function createStartButton() {
+  const button = createButton("🎮 Start Game");
+  button.position(20, 60);
+  button.mousePressed(() => {
+    Tone.start();
+    startGame();
+    button.hide();
+  });
 }
 
 function startGame() {
-  Tone.start(); // Allow audio to work
+  gameStarted = true;
+  paddle = new Paddle();
+  ball = new Ball();
+
   Tone.Transport.scheduleRepeat(playBeat, "4n");
   Tone.Transport.start();
-  startButton.hide();
-  loop(); // Begin draw loop
+  loop(); // start draw loop
 }
 
 function draw() {
   background(20);
+  if (!gameStarted) return;
+
   text("Score: " + score, 10, 30);
 
   paddle.update();
@@ -62,7 +65,7 @@ function keyPressed() {
 
 function playBeat(time) {
   synth.triggerAttackRelease("C4", "8n", time);
-  ball.trigger(time);
+  if (ball) ball.trigger(time);
 }
 
 class Ball {
