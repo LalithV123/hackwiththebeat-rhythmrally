@@ -22,7 +22,12 @@ function setup() {
 
 function createStartButton() {
   const button = createButton("🎮 Start Game");
-  button.position(20, 60);
+  button.position(250, 420); // below the canvas
+  button.style("padding", "10px 20px");
+  button.style("font-size", "16px");
+  button.style("background", "#00ffcc");
+  button.style("border", "none");
+  button.style("border-radius", "8px");
   button.mousePressed(() => {
     Tone.start();
     startGame();
